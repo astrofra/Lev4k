@@ -4,6 +4,8 @@
 
 **A native Ubuntu port is feasible, but the current project does not build on Linux.** OpenGL and GLSL are reusable foundations; Win32/WGL, WinMM, DirectShow, MSVC-specific code, and the Windows executable pipeline are not portable as they stand.
 
+A [CMake build now exists for Windows x86](cmake-build.md), with Editor and Crinkler targets. Reuse that build structure when adding portable targets; its current compiler/platform checks intentionally reject Linux until the native host is implemented.
+
 Use **Ubuntu 24.04 LTS, amd64** as a concrete initial classroom baseline, then test the Ubuntu version selected for deployment as an additional target. This is a chosen baseline, not a claim that 24.04 is the newest release. Ubuntu's release-cycle page records the supported LTS lifetimes. [Ubuntu release cycle](https://ubuntu.com/about/release-cycle).
 
 Separate two deliverables:
@@ -46,7 +48,7 @@ Do not replace the compact Windows host with SDL2 merely to get Linux support. S
 | `__forceinline`, `__cdecl`, `__int64`, MSVC pragmas | Multiple C++ files | Ordinary C++ types/functions or narrowly scoped compiler macros; retain Windows calling conventions only where needed. |
 | Custom `entrypoint`, no default runtime libraries | Project and `main.cpp` | Normal `int main()` for the first port. Reconsider startup only in the Linux size experiment. |
 | Production string-literal mutation and byte-offset selector | `main.cpp` | Writable arrays or separate shader source strings. Editor already selects passes by marker in `debug.h`. |
-| `.sln`, `.vcxproj`, `.bat`, `.obj`, `.exe` tools | Build files and synth directories | CMake targets, native build commands, ELF objects, and an explicit shader-generation step. |
+| Windows-only CMake targets, `.sln`, `.vcxproj`, `.bat`, `.obj`, `.exe` tools | Build files and synth directories | Add native targets to the existing CMake structure, with ELF objects and native shader-generation tools. |
 
 On X11 a non-null GL function pointer does not prove that the active context supports that function. Use version/extension tests too. [SDL2 function-loading guidance](https://wiki.libsdl.org/SDL2/SDL_GL_GetProcAddress).
 

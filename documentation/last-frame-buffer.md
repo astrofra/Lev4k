@@ -76,6 +76,8 @@ Measured on **19 September 2026**, using the Windows 11 / MSVC 14.41 / SDK 10.0.
 
 Release SHA-256: `4B39DA4348A89872F45BF671E50D6279139D3C6E24B7A8B281F195C2F5581B93`.
 
+The subsequent [CMake build](cmake-build.md) reproduces that Release byte-for-byte and exposes the GPU probes through CTest and `build_tests.bat`.
+
 At 1920 × 1080, the two base-level textures occupy `2 * 1920 * 1080 * 4 * 4 = 66,355,200` bytes, approximately **63.3 MiB**. Optional mipmaps add storage. These figures exclude the music buffers, window buffers, and driver allocations.
 
 The automated probe uses a hidden WGL window and real GPU rendering, without sound or display-mode changes. It exercises the shared allocation/reset and reload implementations, with a test rendering loop. Keyboard routing, a complete audible Editor session, fullscreen behavior, and execution of the exact compressed binary remain interactive acceptance checks. No Ubuntu or additional GPU-driver validation is claimed.

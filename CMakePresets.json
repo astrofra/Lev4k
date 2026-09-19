@@ -1,0 +1,22 @@
+{
+  "version": 5,
+  "cmakeMinimumRequired": { "major": 3, "minor": 24, "patch": 0 },
+  "configurePresets": [
+    {
+      "name": "windows-x86",
+      "displayName": "Windows x86: Editor and Crinkler intros",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "Win32",
+      "binaryDir": "${sourceDir}/build/cmake-windows-x86",
+      "cacheVariables": {
+        "CMAKE_CONFIGURATION_TYPES": "Release",
+        "LEV4K_MAX_INTRO_BYTES": "4095"
+      }
+    }
+  ],
+  "buildPresets": [
+    { "name": "editor", "configurePreset": "windows-x86", "configuration": "Release", "targets": ["lev4k_editor"] },
+    { "name": "snapshot", "configurePreset": "windows-x86", "configuration": "Release", "targets": ["lev4k_snapshot"] },
+    { "name": "intro", "configurePreset": "windows-x86", "configuration": "Release", "targets": ["lev4k_release"] }
+  ]
+}

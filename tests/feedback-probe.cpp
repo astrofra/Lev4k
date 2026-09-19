@@ -27,7 +27,10 @@ static int probeMessageBox(HWND, LPCSTR text, LPCSTR, UINT) {
 #endif
 #include "../src/debug.h"
 #include "../src/feedback.h"
-#include "../src/shaders/fragment.inl"
+#ifndef LEV4K_SHADER_HEADER
+#define LEV4K_SHADER_HEADER "../src/shaders/fragment.inl"
+#endif
+#include LEV4K_SHADER_HEADER
 
 int pidMain, pidPost, pidMusic;
 bool AudioNeedReset;

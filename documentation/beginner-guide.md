@@ -19,6 +19,8 @@ The 4K target concerns the final file delivered to the competition. The source, 
 
 ## 2. Prepare the Windows project
 
+For the automatic CMake workflow, run `build_editor.bat` from the repository root after installing the tools in the [CMake build guide](cmake-build.md). That guide also covers compact builds and tests. The steps below describe the existing Visual Studio solution, which remains available.
+
 Install Visual Studio 2022 with **Desktop development with C++**, the MSVC v143 x86/x64 tools, and a Windows SDK. Use the graphics driver appropriate to your GPU. The measured build used SDK `10.0.22621.0`; another installed SDK needs its own verification.
 
 Open [Lev4k.sln](../Lev4k.sln). In the solution toolbar choose **Editor** and **x86**. The project calls the same architecture **Win32**; these names are consistent here. Do not select x64 for this existing solution.

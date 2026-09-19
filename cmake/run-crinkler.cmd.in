@@ -1,0 +1,5 @@
+@echo off
+call "@LEV4K_VCVARS@" x86 @LEV4K_SDK_VERSION@ -vcvars_ver=@LEV4K_VCTOOLS_VERSION@ >nul
+if errorlevel 1 exit /b %errorlevel%
+"@LEV4K_CRINKLER@" %*
+exit /b %errorlevel%

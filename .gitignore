@@ -288,3 +288,5 @@ __pycache__/
 *.xsd.cs
 /commit_with_llm.bat
 /commit_with_llm.py
+/build/
+/CMakeUserPresets.json

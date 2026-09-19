@@ -14,6 +14,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\examples\prepare-example.p
 
 The script prints the new solution path under `examples/_work/drifting-shore-<id>/`. Open that solution, select **Editor / x86**, and press **F5**. Edit the copy's `src/shaders/fragment.frag` and use **Ctrl+S** to reload. Its audio lasts 148 seconds and its default visual resolution is 1920 × 1080.
 
+New copies also include the [CMake build scripts](cmake-build.md). Run `build_editor.bat` inside the copy for that workflow. Its generated solution and outputs live under the copy's `build/` directory.
+
 The command requires the repository's bundled Shader Minifier and Visual Studio 2022 C++ tools. MSBuild is found on PATH or through Visual Studio Installer's `vswhere`. To prepare without compiling C++, omit `-Build Editor`. Minification still runs inside the new copy.
 
 To choose a destination, supply a new path:
@@ -37,6 +39,8 @@ if ($LASTEXITCODE -ne 0) { throw 'Release build failed' }
 Alternatively, prepare another copy with `-Build Release`. Builds never launch the intro automatically. Compression's progress GUI is disabled only in the prepared project. Each copy has its own intermediate and output directories, so experiments do not overwrite the default sample's binaries.
 
 The prepared host differs from the original competition host. The measured adaptation is **4,229 bytes**, above a 4,096-byte limit; size optimization is a separate task. The main LastFrameBuffer sample retains its previous 1,724-byte measurement.
+
+The CMake Release script enforces 4,095 bytes by default and will reject this larger example. For study, explicitly allow a larger maximum with `build_release.bat -MaxIntroBytes 4500`; this does not claim compliance with a 4K limit.
 
 ## Settings carried with the shader
 

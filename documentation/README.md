@@ -7,6 +7,7 @@ Assessment date: **19 September 2026**. The original assessment examined upstrea
 | Requested topic | Finding | Read next |
 | --- | --- | --- |
 | Windows 11 | Feasible on Windows 11 x64. All four configurations build with the updated SDK selection and default structure alignment. Full audiovisual execution still needs acceptance testing. | [Feasibility study](feasibility-study.md) |
+| CMake and automatic builds | Windows x86 presets and `.bat` entry points preserve the 1,724-byte Release; compact builds enforce a configurable byte limit. | [CMake build guide](cmake-build.md) |
 | OpenGL adaptation | OpenGL is already implemented. Retain the compatibility renderer initially; consider a core-profile renderer for portability. | [OpenGL assessment](opengl-assessment.md) |
 | Linux / Ubuntu | A native functional port is feasible, but is not present. A sub-4K Linux executable needs a separate size experiment and release pipeline. | [Ubuntu porting study](ubuntu-porting-study.md) |
 | Beginner C++ documentation | Guided Windows setup, code explanations, a first visual exercise, controls, and size measurement. Ubuntu setup is explicitly preparation for a future port. | [Beginner guide](beginner-guide.md) |

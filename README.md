@@ -15,6 +15,7 @@ The [local examples](examples/README.md) include Drifting Shore and three advanc
 ## Requirements
 
 - Visual Studio 2022 with the C++ desktop tools and MSVC **v143**.
+- CMake **3.24+** for the automatic `.bat` builds; the existing Visual Studio solution also remains usable.
 - A Windows SDK. The project selects an installed version through `10.0`. The documented Windows 11 builds used `10.0.22621.0`.
 - The **x86** solution platform, which maps to **Win32** in the project. There is no x64 build configuration.
 - An OpenGL driver supporting GLSL 3.30, compatibility rendering, and `glCreateShaderProgramv` through OpenGL 4.1 or `GL_ARB_separate_shader_objects`. The current renderer uses legacy drawing calls, so a core-only context is insufficient. See the [OpenGL assessment](documentation/opengl-assessment.md).
@@ -23,7 +24,21 @@ The repository includes Shader Minifier `1.3.5` and Crinkler `2.1a`. Crinkler is
 
 Native Linux support is not implemented. The [Ubuntu study](documentation/ubuntu-porting-study.md) describes the platform changes and a separate path toward a size-limited Linux release.
 
-## Prepare the project
+## Automatic CMake builds
+
+From an ordinary PowerShell in the repository root:
+
+```powershell
+.\build_editor.bat
+.\build_snapshot.bat
+.\build_release.bat
+```
+
+Use `build.bat All` to build all three, or `build_tests.bat` for the GPU regression checks. Executables are written to `build/cmake-windows-x86/out/Release/`. Run Editor from the repository root, or open the generated solution and use F5.
+
+CMake keeps the Shader Minifier → MSVC → Crinkler pipeline: the measured Release remains **1,724 bytes**, byte-identical to the original project build. Compact builds fail if they exceed **4,095 bytes**. See the [CMake and batch build guide](documentation/cmake-build.md) for target details, alternate size limits, and direct CMake commands.
+
+## Using the existing Visual Studio solution
 
 1. Open [Lev4k.sln](Lev4k.sln) and select **Editor / x86**.
 2. Check that the project's **Windows SDK Version** resolves to an installed SDK. Snapshot and Release already use default structure alignment.

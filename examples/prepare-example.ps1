@@ -51,6 +51,12 @@ New-Item -ItemType Directory -Path $destinationPath | Out-Null
 foreach ($file in @('Lev4k.sln', 'Lev4k.vcxproj', 'Lev4k.vcxproj.filters', 'LICENSE', 'link.exe', 'crinkler-license.txt', 'crinkler-manual.txt', 'shader_minifier.exe')) {
     Copy-Item -LiteralPath (Join-Path $projectRoot $file) -Destination (Join-Path $destinationPath $file)
 }
+foreach ($file in @('CMakeLists.txt', 'CMakePresets.json', 'build.bat', 'build_editor.bat', 'build_snapshot.bat', 'build_release.bat')) {
+    Copy-Item -LiteralPath (Join-Path $projectRoot $file) -Destination (Join-Path $destinationPath $file)
+}
+foreach ($directory in @('cmake', 'scripts')) {
+    Copy-Item -LiteralPath (Join-Path $projectRoot $directory) -Destination $destinationPath -Recurse
+}
 Copy-Item -LiteralPath (Join-Path $projectRoot 'src') -Destination $destinationPath -Recurse
 Copy-Item -LiteralPath (Join-Path $upstream 'src\shaders\fragment.frag') -Destination (Join-Path $destinationPath 'src\shaders\fragment.frag')
 Copy-Item -LiteralPath (Join-Path $upstream 'src\shaudio.h') -Destination (Join-Path $destinationPath 'src\shaudio.h')
@@ -80,12 +86,15 @@ This copy uses the maintained Lev4K host with mipmaps, the original audio settin
 and RGBA8 visual targets. See example-origin.json and LICENSE.
 
 Open Lev4k.sln, select Editor / x86, and build/run with F5.
+Alternatively, run build_editor.bat to configure and build through CMake.
 Edit src/shaders/fragment.frag here; Ctrl+S reloads it in Editor.
 The default image size is 1920 x 1080 and the music lasts 148 seconds.
 The shader is demanding; music generation can take time.
 
 Build Snapshot or Release separately and measure out/Lev4k-release.exe.
 This adapted host is not the original competition executable; a 4K result is not guaranteed.
+The CMake Release build enforces a 4095-byte maximum by default. To study a larger
+build explicitly, use build_release.bat -MaxIntroBytes 4500 and record its actual size.
 The original project and other prepared copies are independent of this directory.
 "@, $utf8)
 

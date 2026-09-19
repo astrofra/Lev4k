@@ -58,7 +58,10 @@
 #include "gldefs.h"
 #include "feedback.h"
 #define const
-#include "shaders/fragment.inl"
+#ifndef LEV4K_SHADER_HEADER
+#define LEV4K_SHADER_HEADER "shaders/fragment.inl"
+#endif
+#include LEV4K_SHADER_HEADER
 #undef const
 
 PID_QUALIFIER int pidMain;
