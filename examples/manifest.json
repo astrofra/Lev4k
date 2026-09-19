@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "repository": "https://github.com/TheNuSan/Lev4k",
+  "examples": [
+    {
+      "name": "drifting-shore",
+      "branch": "DriftingShore",
+      "commit": "60721c6605ebc664be2071e3915518e1d57e9014",
+      "status": "prepared-copy",
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "84ead41ccae53d0099e86a6847f62a3c78cb975837a1a522d0fa82cdda2e6cde"
+        },
+        {
+          "path": "src/main.cpp",
+          "sha256": "ceb4bbdc63b66e6755cb43f5bda44ec7ba5feebccd0957110298c9af15e007aa"
+        },
+        {
+          "path": "src/shaders/fragment.frag",
+          "sha256": "eca87a35ee687d8cd72de4ef302173948394a700209200c41a2a6ef03538ce16"
+        },
+        {
+          "path": "src/shaudio.h",
+          "sha256": "7bd04bb4798c2eec6b0d9d787955b0e4e5415eb0d5dac79cae28438d67be4725"
+        },
+        {
+          "path": "src/gldefs.h",
+          "sha256": "67c23e1d9228e985a59783133739331f4bdd2baaccc1abe1215430f4bb6cfbbe"
+        }
+      ]
+    },
+    {
+      "name": "primordial-awakening",
+      "branch": "PrimordialAwakening",
+      "commit": "3fb8f8180785651c774ae754c3dfae3e5f0e71b1",
+      "status": "reference",
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "84ead41ccae53d0099e86a6847f62a3c78cb975837a1a522d0fa82cdda2e6cde"
+        },
+        {
+          "path": "src/main.cpp",
+          "sha256": "e71f89347da344184bd864bcb35f758bd3104635854154c66428dd2975d889c4"
+        },
+        {
+          "path": "src/shaders/fragment.frag",
+          "sha256": "bad14f13447edeec4a4185eedb6b95a0c7d4e98e96ce86c8f97b9577a93d4c8e"
+        },
+        {
+          "path": "src/shaudio.h",
+          "sha256": "1e550d6fc817987e62826e9738c7dfad36715717b88c004e76f9b3a0796c1a93"
+        },
+        {
+          "path": "src/gldefs.h",
+          "sha256": "67c23e1d9228e985a59783133739331f4bdd2baaccc1abe1215430f4bb6cfbbe"
+        },
+        {
+          "path": "src/shaders/vertex.vert",
+          "sha256": "e152d1c40ea83bf179dccd2a82f049c0969aba046cfd24c345de87d2c57d0494"
+        },
+        {
+          "path": "src/Audio_Shaudio.h",
+          "sha256": "24e6040eb54201de11cb89c21c25440f66f8686431aa9bf4689371f6fd2f17e7"
+        },
+        {
+          "path": "src/debug.h",
+          "sha256": "a6f67bdd2834d6996406c78d0f700a8f5e03d180c372ab22cca72a03ca593849"
+        }
+      ]
+    },
+    {
+      "name": "exe-gfx",
+      "branch": "exe_gfx",
+      "commit": "ea10254f33689034a44847e3353167622a4c407f",
+      "status": "reference",
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "84ead41ccae53d0099e86a6847f62a3c78cb975837a1a522d0fa82cdda2e6cde"
+        },
+        {
+          "path": "src/main.cpp",
+          "sha256": "83e288955bd54f8eee283ef2f63d57a9b02bbac6be12d1e71368e0de5ebfaa7d"
+        },
+        {
+          "path": "src/shaders/fragment.frag",
+          "sha256": "9eb0b8cec67bb898e0dcad46828acf3824d98cb05a0cbe7af2755fa7ab878d25"
+        },
+        {
+          "path": "src/shaudio.h",
+          "sha256": "f943f921bb6f89f71ec95f62bdcfcc758eea729043e6dea12a2e46161cee5b9d"
+        },
+        {
+          "path": "src/gldefs.h",
+          "sha256": "67c23e1d9228e985a59783133739331f4bdd2baaccc1abe1215430f4bb6cfbbe"
+        },
+        {
+          "path": "src/Audio_None.h",
+          "sha256": "78c5e3cac3a8bdaf172eb3a122238f7ad5da64b9f83d4777ec4496b5a9a00f8d"
+        },
+        {
+          "path": "src/debug.h",
+          "sha256": "bd90f6488b10331f99e02df80e8b510d4db388a00afc8a63c3686d65548ad1e7"
+        }
+      ]
+    },
+    {
+      "name": "bonzo-compute",
+      "branch": "bonzo_compute",
+      "commit": "2246ddd5ee1ba6bd9ed57012f78b8b4dead346ea",
+      "status": "reference",
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "84ead41ccae53d0099e86a6847f62a3c78cb975837a1a522d0fa82cdda2e6cde"
+        },
+        {
+          "path": "src/main.cpp",
+          "sha256": "ac557da151925383316a2044b256283a13f6b8e2c5089594c1edd276c5cdf2af"
+        },
+        {
+          "path": "src/shaders/fragment.frag",
+          "sha256": "bf7757b84ff61653fa394845d29a7dd5c4f83abbbec6b1de388fcddcdcc7f3ca"
+        },
+        {
+          "path": "src/shaudio.h",
+          "sha256": "f943f921bb6f89f71ec95f62bdcfcc758eea729043e6dea12a2e46161cee5b9d"
+        },
+        {
+          "path": "src/gldefs.h",
+          "sha256": "7f166c0484e79ab74b57b79dfa5c2d0da9a06f2093fd64cd465f33ad6cd19f03"
+        }
+      ]
+    }
+  ]
+}

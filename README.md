@@ -10,6 +10,8 @@ The [upstream branch review](documentation/branch-review.md) compares additional
 
 [LastFrameBuffer is integrated](documentation/last-frame-buffer.md): two alternating floating-point textures retain the previous image for trails. The guide explains the effect, reset behavior, and GPU checks.
 
+The [local examples](examples/README.md) include Drifting Shore and three advanced source references. [Prepare Drifting Shore in its own working directory](documentation/examples.md) to explore it without replacing the default sample.
+
 ## Requirements
 
 - Visual Studio 2022 with the C++ desktop tools and MSVC **v143**.

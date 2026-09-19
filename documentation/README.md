@@ -12,6 +12,7 @@ Assessment date: **19 September 2026**. The original assessment examined upstrea
 | Beginner C++ documentation | Guided Windows setup, code explanations, a first visual exercise, controls, and size measurement. Ubuntu setup is explicitly preparation for a future port. | [Beginner guide](beginner-guide.md) |
 | Evidence and limitations | Local build results, shader probe, environment, and remaining validation gates. | [Validation record](validation-record.md) |
 | LastFrameBuffer integration | Previous-frame feedback, reset behavior, student exercises, and current build/GPU results. | [Feedback guide](last-frame-buffer.md) |
+| Upstream examples | Four local source examples; Drifting Shore can be prepared and built in an independent working directory. | [Examples guide](examples.md) |
 | Other upstream branches | Seven branches reviewed for feedback, still-image accumulation, GPU experiments, production examples, and alternative music workflows. | [Branch review](branch-review.md) |
 
 The repository includes the studies, English student documentation, and the LastFrameBuffer implementation. Build experiments ran in temporary copies; the repeatable GPU probe uses a hidden window.

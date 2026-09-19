@@ -8,6 +8,8 @@ This is a source and Git-history review of all seven non-`main` branches adverti
 
 **Implementation follow-up:** LastFrameBuffer has now been adapted into the working checkout, with initialization, reset handling, and validated shader reload. Its 1,724-byte Release and GPU checks are documented in the [feedback guide](last-frame-buffer.md). The branch snapshots reviewed below remain the upstream versions.
 
+Source excerpts from Drifting Shore, Primordial Awakening, exe_gfx, and bonzo_compute are now [available locally](../examples/README.md). Drifting Shore also has an independent preparation/build workflow; see the [examples guide](examples.md).
+
 ## Branch inventory
 
 Links identify the exact snapshots examined, so the review remains reproducible if branch heads move.
