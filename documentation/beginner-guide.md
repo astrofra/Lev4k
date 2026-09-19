@@ -157,7 +157,7 @@ The default sound path is `AUDIO_SHAUDIO`. Do not assume other backends work by 
 
 ## 7. Editor controls in this checkout
 
-These are derived from the actual code, which differs from the upstream README:
+These controls apply to the default shader-audio configuration:
 
 | Keys | Behavior |
 | --- | --- |
@@ -169,7 +169,7 @@ These are derived from the actual code, which differs from the upstream README:
 | Alt+Left / Alt+Right | Seek backward/forward by roughly one second per polling iteration. |
 | Alt+Shift+Left / Right | Finer seeking: roughly 0.1 second per polling iteration. |
 
-Holding a key can repeat the action each rendered frame. Shift makes these steps **smaller**, contrary to the old README. Camera controls update C++ state, but the supplied shader comments out the camera uniforms and uses a fixed camera; movement becomes visible only after wiring those inputs into the shader.
+Holding a key can repeat the action each rendered frame. Shift makes the seek steps **smaller**. Camera controls update C++ state, but the supplied shader comments out the camera uniforms and uses a fixed camera; movement becomes visible only after wiring those inputs into the shader.
 
 ## 8. Build a small release
 
@@ -180,7 +180,7 @@ Holding a key can repeat the action each rendered frame. Shift makes these steps
 | `Snapshot` | Faster compressed build using embedded shader | `out/Lev4k-snapshot.exe` |
 | `Release` | More compression effort and HTML report | `out/Lev4k-release.exe`, `out.html` |
 
-`EditorNoRecompile` still compiles C++ when needed and still reloads the raw shader. Snapshot and Release have different output names in this project, even though they share an intermediate directory. Rebuild when switching them; do not rely on the older README's claim that Snapshot simply overwrites the Release executable.
+`EditorNoRecompile` still compiles C++ when needed and still reloads the raw shader. Snapshot and Release have different output names in this project, even though they share an intermediate directory. Rebuild when switching them and save any artifact you need to retain before a clean/rebuild operation.
 
 After testing your effect in Editor, rebuild Snapshot, then Release. From Developer PowerShell:
 

@@ -33,7 +33,7 @@ See the [validation record](validation-record.md) for the distinction between co
 | Build | Visual Studio solution, MSVC `v143`, Windows SDK `10.0.17763.0`, Win32 only | [Lev4k.vcxproj](../Lev4k.vcxproj), [Lev4k.sln](../Lev4k.sln) |
 | Size reduction | Bundled Shader Minifier 1.3.5 and Crinkler 2.1a, named `link.exe` | Local tool output; [Crinkler manual](../crinkler-manual.txt) |
 
-There is no CMake project, Linux platform implementation, or native ELF build in this checkout. Other branches mentioned by the upstream README are outside this assessment.
+There is no CMake project, Linux platform implementation, or native ELF build in this checkout. Other branches are outside this assessment.
 
 ## Windows 11
 
@@ -96,7 +96,7 @@ CPU stereo float buffer     = slots * 2 * 4     = 51,210,240 bytes
 GPU RGBA32F texture storage  = slots * 4 * 4     = 102,420,480 bytes
 ```
 
-Those two allocations alone are about **146.5 MiB**, before graphics buffers and driver overhead. The comment describing a two-channel music texture is misleading: its internal format is `GL_RGBA32F`. Large generated buffers can coexist with a tiny executable because their sample values are produced at runtime. The comment and allocation are in [Audio_Shaudio.h](../src/Audio_Shaudio.h); dimensions and duration are in [shaudio.h](../src/shaudio.h).
+Those two allocations alone are about **146.5 MiB**, before graphics buffers and driver overhead. The music texture uses the four-channel internal format `GL_RGBA32F`, while the CPU buffer stores two audio channels. Large generated buffers can coexist with a tiny executable because their sample values are produced at runtime. The allocation is in [Audio_Shaudio.h](../src/Audio_Shaudio.h); dimensions and duration are in [shaudio.h](../src/shaudio.h).
 
 ## Teaching suitability
 

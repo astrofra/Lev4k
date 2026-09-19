@@ -129,7 +129,6 @@ These are code-level findings, not additional runtime tests:
 - Release modifies generated string-literal storage; a portable C++ implementation must remove this assumption.
 - Visual and audio dimensions/sample rates occur in multiple files and must remain consistent.
 - `AUDIO_NONE` advances by a fixed amount per rendered frame.
-- The documented Alt+Up/Down and Shift seek behavior differs from the actual code.
 - The optional WAV adapter has a `track` scope problem; optional reverb requires an absent `m4` and additional integration work.
 - The default shader does not consume the editor's camera controls.
 - Windows-specific source, build tools, and executable output prevent direct native Ubuntu compilation.
