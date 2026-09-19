@@ -45,7 +45,7 @@ Do not replace the compact Windows host with SDL2 merely to get Linux support. S
 | Win32 directory/file helpers in export | [export.cpp](../src/export.cpp) | Portable file/directory operations in the development target; keep exporter out of tiny releases. |
 | `__forceinline`, `__cdecl`, `__int64`, MSVC pragmas | Multiple C++ files | Ordinary C++ types/functions or narrowly scoped compiler macros; retain Windows calling conventions only where needed. |
 | Custom `entrypoint`, no default runtime libraries | Project and `main.cpp` | Normal `int main()` for the first port. Reconsider startup only in the Linux size experiment. |
-| String-literal mutation and byte-offset selector | `main.cpp`, `debug.h` | Writable arrays or separate shader source strings; selector independent of line endings. |
+| Production string-literal mutation and byte-offset selector | `main.cpp` | Writable arrays or separate shader source strings. Editor already selects passes by marker in `debug.h`. |
 | `.sln`, `.vcxproj`, `.bat`, `.obj`, `.exe` tools | Build files and synth directories | CMake targets, native build commands, ELF objects, and an explicit shader-generation step. |
 
 On X11 a non-null GL function pointer does not prove that the active context supports that function. Use version/extension tests too. [SDL2 function-loading guidance](https://wiki.libsdl.org/SDL2/SDL_GL_GetProcAddress).
@@ -108,7 +108,7 @@ First test a normal window on X11/XWayland, then native Wayland, and finally ful
 
 ## Reaching less than 4K on Linux
 
-Crinkler is a Windows 32-bit compressing linker; it is not an ELF backend. The 1,573-byte Windows result therefore cannot predict Linux size. [Crinkler project scope](https://github.com/runestubbe/Crinkler).
+Crinkler is a Windows 32-bit compressing linker; it is not an ELF backend. Neither the original 1,573-byte sample nor the 1,724-byte [feedback version](last-frame-buffer.md) predicts Linux size. [Crinkler project scope](https://github.com/runestubbe/Crinkler).
 
 Start with a stripped native executable and inspect its code, shader data, dynamic imports, ELF metadata, and startup overhead. Compiler optimization for size and dead-code removal are useful baselines, but neither `strip` nor `-Os` guarantees a sub-4K file. ELF tools such as `sstrip` can remove some metadata; they do not replace a complete compression/decompression design. [ELFkickers upstream](https://github.com/BR903/ELFkickers).
 

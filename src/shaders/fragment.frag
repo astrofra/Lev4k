@@ -58,6 +58,10 @@ void m1(void)
 	float fog = 1-clamp(length(p-s)/100,0,1);
 	col += clamp(map(p-r),0,1) * fog;
 
+	// sb1 contains the previous main pass (before post-processing).
+	// This history weight is per frame; use 0.0 for the current image only.
+	col = mix(col, texture(sb1, gl_FragCoord.xy/res.xy).rgb, 0.95);
+
 	o1 = vec4(col,1);
 }
 

@@ -11,6 +11,7 @@
     <ClInclude Include="src\4klang\4klang.h" />
     <ClInclude Include="src\debug.h" />
     <ClInclude Include="src\definitions.h" />
+    <ClInclude Include="src\feedback.h" />
     <ClInclude Include="src\glext.h">
       <Filter>ext</Filter>
     </ClInclude>

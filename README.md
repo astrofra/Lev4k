@@ -2,14 +2,18 @@
 
 Lev4K is a Windows framework for size-limited demoscene intros, based on [Leviathan 2.0](https://github.com/armak/Leviathan-2.0). It is intended to be adapted for each production.
 
-The `main` branch contains a sample with **OpenGL rendering, GLSL raymarching, a post-processing pass, and GPU-generated stereo music** played through WinMM. Shader Minifier reduces the embedded shader source, and Crinkler links and compresses the production executable.
+The sample uses **OpenGL rendering, GLSL raymarching with previous-frame feedback, a post-processing pass, and GPU-generated stereo music** played through WinMM. Shader Minifier reduces the embedded shader source, and Crinkler links and compresses the production executable.
 
 Start with the [beginner guide](documentation/beginner-guide.md). The [documentation index](documentation/README.md) also links the Windows 11 feasibility study, OpenGL assessment, Ubuntu porting plan, and validation results.
+
+The [upstream branch review](documentation/branch-review.md) compares additional effects, production examples, and audio workflows, with recommendations for reuse.
+
+[LastFrameBuffer is integrated](documentation/last-frame-buffer.md): two alternating floating-point textures retain the previous image for trails. The guide explains the effect, reset behavior, and GPU checks.
 
 ## Requirements
 
 - Visual Studio 2022 with the C++ desktop tools and MSVC **v143**.
-- A Windows SDK. The project selects `10.0.17763.0`; retarget it to an installed version if necessary. The documented Windows 11 builds used `10.0.22621.0`.
+- A Windows SDK. The project selects an installed version through `10.0`. The documented Windows 11 builds used `10.0.22621.0`.
 - The **x86** solution platform, which maps to **Win32** in the project. There is no x64 build configuration.
 - An OpenGL driver supporting GLSL 3.30, compatibility rendering, and `glCreateShaderProgramv` through OpenGL 4.1 or `GL_ARB_separate_shader_objects`. The current renderer uses legacy drawing calls, so a core-only context is insufficient. See the [OpenGL assessment](documentation/opengl-assessment.md).
 
@@ -19,10 +23,9 @@ Native Linux support is not implemented. The [Ubuntu study](documentation/ubuntu
 
 ## Prepare the project
 
-1. Open [Lev4k.sln](Lev4k.sln), select **Editor / x86**, and select an installed Windows SDK under the project's **General** properties for all configurations.
-2. For **Snapshot** and **Release**, set **C/C++ > Code Generation > Struct Member Alignment** to **Default**. The checked-in 1-byte packing fails with the SDK used in the Windows 11 study.
-3. Set the Editor debugging **Working Directory** to `$(ProjectDir)`, so the relative shader path resolves correctly.
-4. Before running Editor, apply the [shader pass-selector repair](documentation/opengl-assessment.md#recommended-repair). The current loader's fixed byte offset depends on line endings and fails for the LF shader source in this checkout. This repair is documented but has not been applied to the source.
+1. Open [Lev4k.sln](Lev4k.sln) and select **Editor / x86**.
+2. Check that the project's **Windows SDK Version** resolves to an installed SDK. Snapshot and Release already use default structure alignment.
+3. Build and run with **F5**. Editor's debugging working directory defaults to `$(ProjectDir)`; use the repository root when launching it manually.
 
 The [beginner guide](documentation/beginner-guide.md#2-prepare-the-windows-project) includes the full setup and a quoted, project-relative shader-minification command for the pre-build event.
 
@@ -32,13 +35,13 @@ Edit [src/shaders/fragment.frag](src/shaders/fragment.frag):
 
 | Function | Purpose |
 | --- | --- |
-| `m1` | Main visual pass. |
+| `m1` | Main visual pass; `sb1` reads the previous main-pass image for feedback. |
 | `m2` | Post-processing pass; reads the scene texture through `sb1`. |
 | `m3` | Music synthesis pass. |
 
 The host selects each function by changing the shader's `#define m1 main` directive before compilation. Preserve the pass names and selector while editing. `m4` is reserved for optional audio post-processing and is not implemented in the supplied shader.
 
-Build Editor and press **F5**. After saving shader changes, use **Ctrl+S** to trigger reload, or restart the application. The editor polls the key combination; it does not automatically watch file changes. By default, reload also regenerates the music. `SHAUDIO_UPDATEONSAVE` in [Audio_Shaudio.h](src/Audio_Shaudio.h) controls that regeneration.
+Build Editor and press **F5**. After saving shader changes, use **Ctrl+S** to trigger reload, or restart the application. The editor polls the key combination; it does not automatically watch file changes. A successful reload replaces all passes, clears frame history, and regenerates music by default. A failed reload keeps the previous programs and history. `SHAUDIO_UPDATEONSAVE` in [Audio_Shaudio.h](src/Audio_Shaudio.h) controls music regeneration.
 
 The default sample is **1920 × 1080**, with **145 seconds** of stereo music at **44,100 sample frames per second**. The visual time uniform `m` is a sample-frame count; divide it by `44100.0` to obtain seconds.
 
@@ -81,6 +84,8 @@ These controls apply to the default shader-audio configuration:
 
 Holding a key can repeat the action every rendered frame. Camera controls update editor state, but the sample shader uses a fixed camera and comments out its camera uniforms. Connect those inputs to the shader before expecting camera movement to affect the image.
 
+Seeking, looping, and changing play/pause state reset the frame history. The shader's history weight is `0.95` per rendered frame; change it to `0.0` to remove the trails. See the [feedback guide](documentation/last-frame-buffer.md) for memory use and timing behavior.
+
 ## Optional audio and export code
 
 `AUDIO_TYPE` in [main.cpp](src/main.cpp) selects the audio adapter; its default is `AUDIO_SHAUDIO`. Alternative adapters need their own build and runtime integration.
@@ -111,7 +116,7 @@ After a successful Release build, PowerShell can report the file size:
 (Get-Item -LiteralPath .\out\Lev4k-release.exe).Length
 ```
 
-The documented Windows 11 experiments produced a **1,614-byte Snapshot** and a **1,573-byte Release**, using SDK retargeting and default structure alignment in a temporary copy. Shader compilation/linking was tested on one NVIDIA driver; complete audiovisual execution and native Ubuntu execution remain unvalidated. See the [recorded environment and results](documentation/validation-record.md).
+With LastFrameBuffer integrated, the Windows 11 builds produced a **1,770-byte Snapshot** and a **1,724-byte Release**. GPU tests checked feedback, post-processing, resets, and reload recovery on one NVIDIA driver. Complete audiovisual execution of the application, compressed-executable startup, and native Ubuntu execution remain unvalidated. See the [current results](documentation/last-frame-buffer.md#measurements-and-verification) and [historical baseline](documentation/validation-record.md).
 
 ## Productions and background
 

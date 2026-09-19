@@ -2,6 +2,8 @@
 
 Date: 19 September 2026. Scope: the `main` checkout at commit `1e3d1654f495d82b91063dd8d23da34135d6d431`, Windows 11, OpenGL, native Ubuntu, and introductory teaching material.
 
+This page records the **original baseline assessment**. The Windows build maintenance, Editor reload repairs, and feedback rendering have since been implemented. See the [LastFrameBuffer guide](last-frame-buffer.md) for the current code, 1,724-byte Release, and GPU results.
+
 ## Recommendation
 
 **Proceed with Windows 11 maintenance and a staged Ubuntu port.** Start by fixing the build settings and shader reload logic, establish a working audiovisual reference, and preserve a small Windows release target. Develop the Ubuntu teaching application with a normal runtime and diagnostics. Treat a Linux executable below the agreed byte limit as a separate milestone whose success must be measured.
@@ -33,7 +35,7 @@ See the [validation record](validation-record.md) for the distinction between co
 | Build | Visual Studio solution, MSVC `v143`, Windows SDK `10.0.17763.0`, Win32 only | [Lev4k.vcxproj](../Lev4k.vcxproj), [Lev4k.sln](../Lev4k.sln) |
 | Size reduction | Bundled Shader Minifier 1.3.5 and Crinkler 2.1a, named `link.exe` | Local tool output; [Crinkler manual](../crinkler-manual.txt) |
 
-There is no CMake project, Linux platform implementation, or native ELF build in this checkout. Other branches are outside this assessment.
+There is no CMake project, Linux platform implementation, or native ELF build in this checkout. This assessment covers `main`; the separate [upstream branch review](branch-review.md) examines the other seven branches and their potential for reuse.
 
 ## Windows 11
 
@@ -53,9 +55,11 @@ Observed build results:
 | Snapshot with default packing | Success; compression log reports 1,614 bytes. |
 | Release with default packing | Success; file length is 1,573 bytes. |
 
-All experiments used a temporary copy. `/PROGRESSGUI` was removed there for unattended compression. The original project remains unchanged.
+All experiments used a temporary copy. `/PROGRESSGUI` was removed there for unattended compression. The original project was left unchanged during those baseline experiments.
 
-### Required preparation
+### Maintenance identified in the baseline
+
+The following maintenance is now included in the LastFrameBuffer integration:
 
 1. Retarget all configurations to an installed SDK; retain `v143` and Win32.
 2. Set **C/C++ > Code Generation > Struct Member Alignment > Default** for Snapshot and Release. Do not suppress the SDK packing assertion.

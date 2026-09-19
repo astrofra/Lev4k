@@ -22,14 +22,13 @@ flowchart TD
     B --> C[m3 renders music into a float texture]
     C --> D[Read samples to RAM and start waveOut playback]
     D --> E[Read audio position and update uniform m]
-    E --> F[m1 draws the scene into the window back buffer]
-    F --> G[Copy scene pixels into a texture]
-    G --> H[m2 reads that texture and draws the final image]
-    H --> I[SwapBuffers]
+    E --> F[m1 reads previous texture and writes the other FBO]
+    F --> H[m2 reads the new texture and draws into the window]
+    H --> I[SwapBuffers and alternate the texture roles]
     I --> E
 ```
 
-This diagram describes the default shader-audio configuration. Music is generated at startup and, by default, again after editor shader reload. The scene uses the default framebuffer followed by `glCopyTexImage2D`; it is not initially rendered into a dedicated scene FBO.
+This diagram describes the default shader-audio configuration. Music is generated at startup and, by default, again after editor shader reload. The scene renders directly into one of two RGBA32F FBO attachments; the previous main image is available to `m1` through `sb1`. Successful reloads and Editor timeline changes clear history. See [LastFrameBuffer](last-frame-buffer.md).
 
 ## Existing compatibility assumptions
 
@@ -39,38 +38,13 @@ The runtime uses `glRects`, fragment-only programs, and the legacy `GL_LUMINANCE
 
 On Windows, function addresses must be obtained for an appropriate current context. Add version/extension checks as well as pointer validation. [Microsoft `wglGetProcAddress` documentation](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-wglgetprocaddress).
 
-## Confirmed shader-selection defect
+## Shader selection and reload
 
-The host compiles the same GLSL source repeatedly, changing this definition to select a different entry function:
+The host compiles the shared source for each pass by changing its `#define m1 main` directive. Editor's [replaceShaderPrograms](../src/debug.h) finds that exact marker in a writable source buffer instead of assuming a fixed byte offset. Both LF and CRLF are accepted.
 
-```glsl
-#version 330
-#define m1 main
-```
+Editor links every active pass before replacing the current program set. A failed pass produces a diagnostic and releases the candidate programs; the old programs, audio-reset state, and frame history remain intact. A successful reload replaces the set, releases the old programs, and requests audio regeneration and a history reset. The [GPU probe](last-frame-buffer.md#reproduce-the-gpu-checks) checks failures in each of the three default passes and successful recovery.
 
-`MULTI_MAIN_LOCATION` is 22. In the generated string, the digit `1` is at zero-based byte 22. However, `refreshShaders` in [debug.h](../src/debug.h) modifies byte **23**, using `MULTI_MAIN_LOCATION + 1`.
-
-The actual source file in this checkout uses **LF** line endings: byte 22 is `1`, and byte 23 is the following space. Replacing byte 23 creates `#define m12main` or `#define m13main`, so the intended entry function is absent. A hidden-window GPU probe confirmed that the original editor selection fails to link passes 2 and 3; selecting byte 22 succeeds. The generated/minified shader passes also link successfully. See the [validation record](validation-record.md).
-
-CRLF after the first line happens to shift the digit to byte 23. Changing editor line-ending settings can therefore change behavior. A UTF-8 BOM, a new comment, or a different version directive can break both numeric offsets.
-
-### Recommended repair
-
-In Editor, find and validate the entry-selection marker by content. Work on a writable source buffer. Replace old programs only after **all** new programs have compiled and linked; report individual pass errors and delete abandoned shader/program objects.
-
-The following small modification is a proposed teaching fix, not a change already applied to the repository. In `refreshShaders`, insert this immediately after `if (!newSource) return;`, before the first `shaderDebug` call:
-
-```cpp
-char* passNumber = strstr(newSource, "#define m1 main");
-if (!passNumber) {
-    fprintf(stderr, "Missing shader pass selector\n");
-    free(newSource);
-    return;
-}
-passNumber += strlen("#define m");
-```
-
-Then replace each assignment to `newSource[MULTI_MAIN_LOCATION + 1]` (including the optional `m4` case) with `*passNumber = '2';`, `*passNumber = '3';`, or `*passNumber = '4';` respectively. This handles either LF or CRLF for the exact selector shown. Keep that selector's spelling unchanged. This snippet fixes selection only; transactional reload and link diagnostics still need implementation.
+The compact Snapshot/Release path retains `MULTI_MAIN_LOCATION = 22` for the generated minified source. The probe verifies that offset and links the generated passes. Preserve the `#define m1 main` spelling and regenerate the embedded shader after edits.
 
 For a larger refactor, supply the version directive, pass definition, and shared body as separate shader source strings. Keep `#version` first. This removes byte-offset patching entirely. Preserve pass functions during minification: the current command protects `m1,m2,m3,m4`, and preserves external uniform names. [Shader Minifier usage](https://github.com/laurentlb/shader-minifier).
 
@@ -83,7 +57,7 @@ The compact path also modifies a string literal after removing `const` through a
 | Retain compatibility rendering | Smallest initial change; keeps the Windows size baseline close to the original | Requires compatibility support and careful testing; preserves legacy drawing and audio formats. |
 | Add an OpenGL 3.3 core renderer | Explicit, portable pipeline suitable for teaching and Ubuntu | Adds vertex-stage and object setup; changes the audio texture path; byte cost must be measured. |
 
-**Recommended sequence:** repair the existing path, establish reference output, then develop the core renderer for the portable application. Keep the Windows tiny target available while measuring the new path.
+**Recommended sequence:** complete interactive audiovisual acceptance of the maintained path, then develop the core renderer for the portable application. Keep the Windows tiny target available while measuring the new path.
 
 ### Core-profile implementation work
 
@@ -91,7 +65,7 @@ The compact path also modifies a string literal after removing `const` through a
 2. **Geometry:** replace every `glRects` / `glRectf` call, including music and optional realtime/reverb paths, with a fullscreen triangle. Use a vertex shader and a bound VAO; vertices can be generated from `gl_VertexID`.
 3. **Programs:** for a true OpenGL 3.3 baseline, use `glCreateShader`, compilation, attachment, and normal linking of vertex and fragment shaders. Do not retain an unchecked dependency on `glCreateShaderProgramv`.
 4. **Music format:** replace legacy luminance/alpha transfers. A two-channel `GL_RG32F` target with `GL_RG` / `GL_FLOAT` readback is a candidate. Change `m3` from `vec4(0, 0, mus)` to an output that stores left/right in red/green, such as `vec4(mus, 0, 1)`. Update reverb sampling too. Compare stereo channels and amplitude against the reference.
-5. **Texture ownership:** allocate separate named music and post-process textures. The current hard-coded post texture name `1` can reuse a generated music texture name; make ownership explicit before adding passes.
+5. **Texture ownership:** preserve the separate named music resources and two visual history textures introduced by LastFrameBuffer. Reallocate and clear history when the portable window changes size.
 6. **Dimensions:** separate display size from audio render dimensions. Pass actual framebuffer dimensions to the portable visual shaders; pass or generate a consistent audio row width. Resizing a window must not alter sample ordering.
 7. **Diagnostics and lifetime:** check FBO completeness, texture-size limits, link logs, and GL errors; delete resources on reload and shutdown.
 

@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{59C1D4F3-AE93-4A0A-B4FE-60841CA865E5}</ProjectGuid>
     <ProjectName>Lev4k</ProjectName>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -72,6 +72,7 @@
     <LinkIncremental>false</LinkIncremental>
     <ExecutablePath>$(SolutionDir);$(ExecutablePath)</ExecutablePath>
     <TargetName>Lev4k-debug</TargetName>
+    <LocalDebuggerWorkingDirectory>$(ProjectDir)</LocalDebuggerWorkingDirectory>
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='EditorNoRecompile|Win32'">
@@ -80,6 +81,7 @@
     <LinkIncremental>false</LinkIncremental>
     <ExecutablePath>$(SolutionDir);$(ExecutablePath)</ExecutablePath>
     <TargetName>Lev4k-debug</TargetName>
+    <LocalDebuggerWorkingDirectory>$(ProjectDir)</LocalDebuggerWorkingDirectory>
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -163,7 +165,7 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>shader_minifier.exe -v --preserve-externals -o .\src\shaders\fragment.inl .\src\shaders\fragment.frag --no-renaming-list m1,m2,m3,m4"</Command>
+      <Command>&quot;$(ProjectDir)shader_minifier.exe&quot; -v --preserve-externals -o &quot;$(ProjectDir)src\shaders\fragment.inl&quot; &quot;$(ProjectDir)src\shaders\fragment.frag&quot; --no-renaming-list m1,m2,m3,m4</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='EditorNoRecompile|Win32'">
@@ -255,7 +257,7 @@
       <StringPooling>false</StringPooling>
       <ExceptionHandling>false</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <StructMemberAlignment>1Byte</StructMemberAlignment>
+      <StructMemberAlignment>Default</StructMemberAlignment>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <FloatingPointModel>Fast</FloatingPointModel>
       <PrecompiledHeaderOutputFile>.\bin/Release/Lev4k.pch</PrecompiledHeaderOutputFile>
@@ -306,7 +308,7 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>shader_minifier.exe -v --preserve-externals -o .\src\shaders\fragment.inl .\src\shaders\fragment.frag --no-renaming-list m1,m2,m3,m4"</Command>
+      <Command>&quot;$(ProjectDir)shader_minifier.exe&quot; -v --preserve-externals -o &quot;$(ProjectDir)src\shaders\fragment.inl&quot; &quot;$(ProjectDir)src\shaders\fragment.frag&quot; --no-renaming-list m1,m2,m3,m4</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Snapshot|Win32'">
@@ -330,7 +332,7 @@
       <StringPooling>false</StringPooling>
       <ExceptionHandling>false</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <StructMemberAlignment>1Byte</StructMemberAlignment>
+      <StructMemberAlignment>Default</StructMemberAlignment>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <FloatingPointModel>Fast</FloatingPointModel>
       <PrecompiledHeaderOutputFile>.\bin/Release/Lev4k.pch</PrecompiledHeaderOutputFile>
@@ -383,7 +385,7 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>shader_minifier.exe -v --preserve-externals -o .\src\shaders\fragment.inl .\src\shaders\fragment.frag --no-renaming-list m1,m2,m3,m4"</Command>
+      <Command>&quot;$(ProjectDir)shader_minifier.exe&quot; -v --preserve-externals -o &quot;$(ProjectDir)src\shaders\fragment.inl&quot; &quot;$(ProjectDir)src\shaders\fragment.frag&quot; --no-renaming-list m1,m2,m3,m4</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -398,6 +400,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Snapshot|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="src\definitions.h" />
+    <ClInclude Include="src\feedback.h" />
     <ClInclude Include="src\dr_wav.h" />
     <ClInclude Include="src\editor.h" />
     <ClInclude Include="src\export.h" />

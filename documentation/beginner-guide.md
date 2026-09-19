@@ -2,7 +2,7 @@
 
 This guide is for students who know basic C++ variables, functions, conditions, and loops. It introduces this particular framework, rather than assuming that its very small release executable is a model for every C++ application.
 
-**Start on Windows with the prepared Editor build.** Native Ubuntu support is proposed in the [Ubuntu study](ubuntu-porting-study.md); it is not implemented in this checkout. An instructor should apply and verify the preparation steps below before a class.
+**Start on Windows with the prepared Editor build.** Native Ubuntu support is proposed in the [Ubuntu study](ubuntu-porting-study.md); it is not implemented in this checkout. An instructor should verify the setup and run an interactive session before a class.
 
 ## 1. What are we making?
 
@@ -23,23 +23,24 @@ Install Visual Studio 2022 with **Desktop development with C++**, the MSVC v143 
 
 Open [Lev4k.sln](../Lev4k.sln). In the solution toolbar choose **Editor** and **x86**. The project calls the same architecture **Win32**; these names are consistent here. Do not select x64 for this existing solution.
 
-Before the first run, an instructor or maintainer should make these changes in a working copy:
+Before the first run:
 
-1. Open project properties for **All Configurations / Win32**, and select an installed **Windows SDK Version** under General. The checked-in value, `10.0.17763.0`, may be missing.
-2. For **Snapshot** and **Release**, choose **C/C++ > Code Generation > Struct Member Alignment > Default**. The checked-in 1-byte alignment fails with the tested modern SDK.
-3. Apply the marker-based editor selector fix in the [OpenGL assessment](opengl-assessment.md). Without it, this LF checkout's post-process and music programs fail to link even though C++ compilation succeeds.
-4. For Editor, set **Debugging > Working Directory** to `$(ProjectDir)`. The shader loader opens `./src/shaders/fragment.frag` relative to the process's working directory.
-5. Keep the repository's shader minifier and Crinkler `link.exe` accessible to the build. Do not replace the Microsoft installation's linker with the bundled file.
+1. Check **All Configurations / Win32 > General > Windows SDK Version**. The checked-in `10.0` selects an installed SDK; the tested version is `10.0.22621.0`.
+2. Keep the default structure alignment already configured for Snapshot and Release.
+3. Keep Editor's **Debugging > Working Directory** at the supplied `$(ProjectDir)` value. When launching manually, use the repository root.
+4. Keep the bundled shader minifier and Crinkler `link.exe` in the repository. Do not replace the Microsoft installation's linker with the bundled file.
 
-For Editor, Snapshot, and Release, a clearer **Build Events > Pre-Build Event > Command Line** is:
+Editor already supports LF/CRLF shader files and preserves the previous programs if any replacement pass fails to link.
+
+Editor, Snapshot, and Release use quoted project-relative paths for shader minification, equivalent to:
 
 ```text
 "$(ProjectDir)shader_minifier.exe" -v --preserve-externals --no-renaming-list m1,m2,m3,m4 -o "$(ProjectDir)src\shaders\fragment.inl" "$(ProjectDir)src\shaders\fragment.frag"
 ```
 
-The checked-in command has a trailing unmatched quote, although it happened to run successfully in the recorded build. Keep `EditorNoRecompile`'s event empty: that configuration intentionally skips this generation step.
+Keep `EditorNoRecompile`'s event empty: that configuration intentionally skips this generation step.
 
-Build with **Build > Build Solution**, then run with **F5**. A successful C++ build is the first checkpoint; correct pictures, sound, and reload are the next checkpoints. This study verified compilation and shader linking, but did not validate a complete interactive session. Press **Escape** to exit a running intro. Expect the initial music calculation to take some time.
+Build with **Build > Build Solution**, then run with **F5**. A successful C++ build is the first checkpoint; correct pictures, sound, and reload are the next checkpoints. Automated checks verify compilation, GPU rendering, feedback, and reload recovery; a complete interactive session remains an acceptance check. Press **Escape** to exit a running intro. Expect the initial music calculation to take some time.
 
 ### Optional command-line builds
 
@@ -61,7 +62,8 @@ Replace the SDK number if your prepared project uses a different installed versi
 | [fragment.inl](../src/shaders/fragment.inl) | Generated C++ text containing the minified shader | Read it for comparison; edit `.frag` instead. |
 | [shaudio.h](../src/shaudio.h) | Music duration, sample rate, and render dimensions | `SONG_DURATION`, `SAMPLE_RATE`, `SHAUDIO_XRES`, `SHAUDIO_YRES` |
 | [Audio_Shaudio.h](../src/Audio_Shaudio.h) | GPU music generation and Windows playback | `RenderMusic`, `AudioGetTime` |
-| [debug.h](../src/debug.h) | Editor shader loading and debugging | `refreshShaders` |
+| [debug.h](../src/debug.h) | Editor shader loading and debugging | `refreshShaders`, `replaceShaderPrograms` |
+| [feedback.h](../src/feedback.h) | Two alternating render targets | `InitFrameHistory`, `ClearFrameHistory` |
 | [editor.cpp](../src/editor.cpp) | Editor controls and statistics | Camera and timing functions |
 
 A `.cpp` file is compiled as a C++ translation unit. A header such as `.h` or this project's `.inl` contributes text where `#include` inserts it. The compiler creates object files; the linker combines the required code and data into an executable.
@@ -85,8 +87,8 @@ After initialization, the program repeatedly:
 1. Processes some operating-system/input work.
 2. Gets the current audio position.
 3. Sends that position to the scene shader.
-4. Draws the scene, copies it into a texture, and draws the post-process.
-5. Displays the new frame with `SwapBuffers`.
+4. Draws the scene into one texture while reading the previous image from the other.
+5. Draws the post-process from the newly rendered texture, displays it with `SwapBuffers`, and alternates the texture roles.
 
 `pidMain` and `pidPost` are integer handles identifying GPU programs. `glUseProgram(pidMain)` selects a program. `glGetUniformLocation(pidMain, "m")` finds its time input, and `glUniform1i` supplies an integer value.
 
@@ -96,7 +98,7 @@ The functions have these roles:
 
 | Function | Work |
 | --- | --- |
-| `m1` | Draws the main image. The sample uses raymarching through a mathematical distance field. |
+| `m1` | Raymarches the scene and mixes its color with the previous main image from `sb1`. |
 | `m2` | Reads texture `sb1` and processes the image. The sample offsets the color channels. |
 | `m3` | Produces music samples in a texture instead of visible pixels. |
 | `m4` | Reserved for optional audio post-processing; absent from the supplied shader. |
@@ -129,7 +131,7 @@ Save the file and trigger the prepared editor's **Ctrl+S** reload. Its current i
 
 Try changing `sin(seconds)` to `sin(seconds * 2.0)`. The animation should run twice as fast. Then restore the original `m1` and change the object color or rotation speed. Change one expression at a time so that you can explain the result.
 
-If the window is black, inspect shader errors and the known selector issue before rewriting the effect. The current debug helper does not check every pass's link status.
+If the window is black, inspect the reported shader link errors, working directory, and graphics-driver support. Editor checks every active pass and keeps the previous programs on a failed reload.
 
 ## 6. Time, sound, and resolution
 
@@ -196,7 +198,7 @@ This example deliberately enforces **strictly less than 4,096**. For a competiti
 
 Check `out.html` to see what consumes compressed space. Make one change, rebuild, record the new byte count, and compare appearance/sound. Shorter source is not always a smaller compressed executable.
 
-The sample measured 1,573 bytes under the study's conditions. Your content, compiler, and linker can produce different results. Test the exact Release file on the intended playback machine; Editor success is not Release acceptance.
+The sample with LastFrameBuffer measured **1,724 bytes** under the [recorded conditions](last-frame-buffer.md#measurements-and-verification). Your content, compiler, and linker can produce different results. Test the exact Release file on the intended playback machine; Editor success is not Release acceptance.
 
 ## 9. Common problems
 
@@ -204,7 +206,7 @@ The sample measured 1,573 bytes under the study's conditions. Your content, comp
 | --- | --- |
 | `MSB8036` | Select an installed Windows SDK for all configurations. |
 | `C2338` mentioning packing | Use default structure alignment in Snapshot/Release. |
-| Black screen or missing music despite a successful build | Apply the selector repair; check all shader link logs, context support, and audio opening. |
+| Black screen or missing music despite a successful build | Check shader link logs, context support, the working directory, and audio opening. |
 | Shader edits seem ignored | Save `.frag`, use the repository root as working directory, reload or restart; rebuild embedded-shader configurations. |
 | Unknown `/CRINKLER` or MSVC linker-option warnings | Check whether the repository's `link.exe` is selected for the compressed configurations. |
 | Wrong image size/aspect | Keep C++ visual dimensions and GLSL `res` consistent; check desktop scaling. |
@@ -219,7 +221,7 @@ For normal C++ coursework, continue using standard library containers, clear own
 2. Implement and explain the gradient above.
 3. Animate a parameter using audio time.
 4. Restore the raymarcher and change one shape or color parameter.
-5. Add a simple post-process and compare its byte cost.
+5. Experiment with the [history weight and trails](last-frame-buffer.md), then add a simple post-process and compare its byte cost.
 6. Change a music parameter, observe duration/memory constraints, and compare sound.
 7. Produce a measured release with a short compatibility record.
 

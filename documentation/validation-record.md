@@ -2,9 +2,11 @@
 
 Assessment date: **19 September 2026**. Repository baseline: `main`, commit `1e3d1654f495d82b91063dd8d23da34135d6d431` (12 April 2025).
 
-## Scope of the experiments
+This page preserves the **original baseline experiments**. Current implementation and results are in the [LastFrameBuffer validation](last-frame-buffer.md#measurements-and-verification): Release is now 1,724 bytes, and the repeatable GPU probe checks rendering and reload recovery.
 
-Application sources, project files, and bundled tools in the repository were left unchanged. Builds ran in a temporary copy containing the root project/tool files and `src/`. The temporary project was adjusted progressively as recorded below. Only Markdown documentation is delivered in the repository.
+## Scope of the original experiments
+
+Application sources, project files, and bundled tools in the repository were left unchanged. Builds ran in a temporary copy containing the root project/tool files and `src/`. The temporary project was adjusted progressively as recorded below. That initial delivery contained only Markdown documentation; source changes were introduced during the subsequent LastFrameBuffer integration.
 
 No complete Lev4K application session was run. A small independent x86 probe created a **hidden Win32 window and legacy WGL context**, then compiled/linked the repository's shaders. It did not play sound, render the final intro, switch display modes, or verify the compressed executable's startup.
 
@@ -83,7 +85,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Release failed' }
 (Get-Item -LiteralPath .\out\Lev4k-release.exe).Length
 ```
 
-No application source correction was needed for these **build-only** results. Editor operation still needs the shader-selection repair.
+No application source correction was needed for these **build-only** results. The baseline Editor still needed the shader-selection repair at that stage; it is included in the current implementation.
 
 ### Identifying hashes
 
@@ -115,11 +117,11 @@ Here `\n` represents a line-feed byte. The pass digit is at zero-based index 22;
 | Beginner gradient, marker selector | Pass | Pass | Pass |
 | Beginner gradient after bundled minification, index 22 | Pass | Pass | Pass |
 
-The failing programs reported `error C3001: no program defined`. The marker test searched for `#define m1 main`, advanced by `strlen("#define m")`, and changed that digit. Both LF and CRLF variants were tested. This validates the selector's behavior for those inputs; the snippet was not integrated into the repository's complete editor.
+The original failing programs reported `error C3001: no program defined`. The marker test searched for `#define m1 main`, advanced by `strlen("#define m")`, and changed that digit. Both LF and CRLF variants were tested. This validates the selector's behavior for those inputs; the snippet was not yet integrated during that baseline experiment. The current Editor uses a marker selector and validates all active passes.
 
 The gradient test extracted the exact GLSL example from [beginner-guide.md](beginner-guide.md), replaced `m1` and `m2` in the temporary shader, retained the supplied `m3`, and tested raw and generated passes. Compilation/linking passed; the expected animated appearance remains a runtime acceptance item.
 
-## Findings from source inspection
+## Findings from baseline source inspection
 
 These are code-level findings, not additional runtime tests:
 
@@ -133,7 +135,7 @@ These are code-level findings, not additional runtime tests:
 - The default shader does not consume the editor's camera controls.
 - Windows-specific source, build tools, and executable output prevent direct native Ubuntu compilation.
 
-## Acceptance tests still required
+## Acceptance status at the baseline assessment
 
 | Area | Test and success criterion | Current status |
 | --- | --- | --- |

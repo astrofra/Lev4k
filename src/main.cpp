@@ -56,6 +56,7 @@
 
 #include "glext.h"
 #include "gldefs.h"
+#include "feedback.h"
 #define const
 #include "shaders/fragment.inl"
 #undef const
@@ -134,7 +135,7 @@ int __cdecl main(int argc, char* argv[])
 	wglMakeCurrent(hDC, wglCreateContext(hDC));
 	
 	#if NOT_USE_MINIFIER
-		refreshShaders(true);
+		if (!refreshShaders(true)) ExitProcess(1);
 	#else
 		pidMain = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1, &fragment_frag);
 		
@@ -160,6 +161,10 @@ int __cdecl main(int argc, char* argv[])
 	// initialize sound
 		
 	AudioInit();
+	InitFrameHistory();
+	#ifdef EDITOR_CONTROLS
+		bool frameHistoryReset = false;
+	#endif
 		
 	// main loop
 	do
@@ -176,10 +181,16 @@ int __cdecl main(int argc, char* argv[])
 		#endif
 
 		#ifdef EDITOR_CONTROLS
-			refreshShaders(false);	
+			if (refreshShaders(false)) frameHistoryReset = true;
 		#endif
 			
 		AudioUpdate();
+		#ifdef EDITOR_CONTROLS
+			if (frameHistoryReset) {
+				ClearFrameHistory();
+				frameHistoryReset = false;
+			}
+		#endif
 
 		////////////////////////////
 		// MAIN RENDERING //
@@ -187,8 +198,11 @@ int __cdecl main(int argc, char* argv[])
 
 		glViewport(0, 0, XRES, YRES);
 
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, frameTextures[frameIndex ^ 1]);
+		glBindFramebuffer(GL_FRAMEBUFFER, frameBuffers[frameIndex]);
 		glUseProgram(pidMain);
+		glUniform1i(glGetUniformLocation(pidMain, "sb1"), 0);
 				
 		#ifdef EDITOR_CONTROLS
 			glUniform3f(glGetUniformLocation(pidMain, "camPos"), editor.camPosX, editor.camPosY, editor.camPosZ);
@@ -213,20 +227,12 @@ int __cdecl main(int argc, char* argv[])
 		// POST-PROCESS //
 		//////////////////
 
-		glBindTexture(GL_TEXTURE_2D, 1);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glBindTexture(GL_TEXTURE_2D, frameTextures[frameIndex]);
 
 		#if USE_MIPMAPS
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-			glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 0, 0, XRES, YRES, 0);
 			glGenerateMipmap(GL_TEXTURE_2D);
-		#else
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 0, 0, XRES, YRES, 0);
 		#endif	
-					
-		glActiveTexture(GL_TEXTURE0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 		glUseProgram(pidPost);
 
@@ -236,6 +242,7 @@ int __cdecl main(int argc, char* argv[])
 		glRects(-1, -1, 1, 1);
 
 		SwapBuffers(hDC);
+		frameIndex ^= 1;
 
 		#if RECORD_IMG
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -250,7 +257,9 @@ int __cdecl main(int argc, char* argv[])
 			editor.endFrame(timeGetTime());
 			editor.handleCameraEvents();
 			#if AUDIO_TYPE == AUDIO_WAVE
+				double previousPosition = position;
 				position = editor.handleTrackEvents(&track, position);
+				if (position != previousPosition || (GetAsyncKeyState(VK_MENU) && GetAsyncKeyState(VK_SPACE))) frameHistoryReset = true;
 			#elif AUDIO_TYPE != AUDIO_NONE				
 				waveOutGetPosition(hWaveOut, &MMTime, sizeof(MMTIME));
 				int curtime = MMTime.u.sample + musicoffset;
@@ -285,6 +294,7 @@ int __cdecl main(int argc, char* argv[])
 				if(newtime<0) newtime += MAX_SAMPLES;
 
 				if(newtime != curtime || play != prevplay) {
+					frameHistoryReset = true;
 					if(newtime<0) newtime = 0;
 					if(newtime>=MAX_SAMPLES) newtime = MAX_SAMPLES-1;
 						
